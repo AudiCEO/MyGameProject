@@ -7,10 +7,10 @@ class ChickenGameObject extends GameObject {
 }
 
 class CarGameObject extends GameObject {
-    constructor(dir) {
+    constructor(dir, speed = 80) {
         super("Car")
         this.addComponent(new Polygon(), { fillStyle: "red", points: Assets.carRect })
-        this.addComponent(new CarController(), { dir: dir })
+        this.addComponent(new CarController(), { dir: dir, speed: speed })
     }
 }
 
