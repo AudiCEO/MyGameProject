@@ -1,4 +1,22 @@
+//Which screen we are on: "start", "playing", "help", "over", or "won"
 let gameState = "start"
+
+//How many retries the chicken has left (1 means one extra try)
+let lives = 1
+
+//Week 7 variables
+let score = 0
+let bestScore = 0
+let highestLane = 0     
+let invincibleTime = 0  
+
+//Ends the game and saves the best score
+function endGame(state) {
+    gameState = state
+    if (score > bestScore) {
+        bestScore = score
+    }
+}
 
 const menuButton = { x: 200, y: 330, w: 200, h: 60 }
 const helpButton = { x: 200, y: 410, w: 200, h: 60 }
@@ -20,6 +38,10 @@ addEventListener("click", function (event) {
         if (isInside(mx, my, backButton)) gameState = "start"
     } else if (gameState === "over" || gameState === "won") {
         if (isInside(mx, my, menuButton)) {
+            lives = 1
+            score = 0
+            highestLane = 0
+            invincibleTime = 0
             Engine.currentScene = new MainScene()
             Engine.currentScene.start()
             gameState = "playing"
@@ -39,6 +61,14 @@ class ChickenController extends Component {
     update() {
         if (gameState !== "playing") return
 
+        //Count down the invincibility timer
+        if (invincibleTime > 0) {
+            invincibleTime = invincibleTime - Time.deltaTime
+        }
+
+        this.checkCarHit()
+        if (gameState !== "playing") return
+
         if (!Input.keysDown.includes("Space") && !Input.keysDown.includes("ArrowLeft") && !Input.keysDown.includes("ArrowRight")) {
             this.canMove = true
         }
@@ -48,13 +78,11 @@ class ChickenController extends Component {
         if (Input.keysDown.includes("Space")) this.move(this.lane + 1, this.col)
         if (Input.keysDown.includes("ArrowLeft")) this.move(this.lane, this.col - 1)
         if (Input.keysDown.includes("ArrowRight")) this.move(this.lane, this.col + 1)
-
-        this.checkCarHit()
     }
 
     move(newLane, newCol) {
         if (newLane > 9) {
-            gameState = "won"
+            endGame("won")
             return
         }
 
@@ -68,14 +96,30 @@ class ChickenController extends Component {
         this.col = newCol
         this.transform.position = new Vector2(this.col * 60 + 30, 570 - this.lane * 60)
         this.canMove = false
+
+        //Only score when reaching a lane further than ever before
+        if (this.lane > highestLane) {
+            highestLane = this.lane
+            score = score + 1
+        }
     }
 
     checkCarHit() {
         for (const go of Engine.currentScene.gameObjects) {
             if (go.name === "Car") {
                 let dist = this.transform.position.minus(go.transform.position).magnitude
-                if (dist < 25) {
-                    gameState = "over"
+                if (dist < 25 && invincibleTime <= 0) {
+                    if (lives > 0) {
+                        //Still have a retry: lose one and go back to the start
+                        lives = lives - 1
+                        this.lane = 0
+                        this.col = 4
+                        this.transform.position = new Vector2(270, 570)
+                        invincibleTime = 2
+                    } else {
+                        //No retries left, game over
+                        endGame("over")
+                    }
                 }
             }
         }
