@@ -3,27 +3,38 @@ class MainScene extends Scene {
         super()
         this.instantiate(new ChickenGameObject(), new Vector2(270, 570))
 
-        //Trees: position uses x = col*60+30 and y = 570 - lane*60
-        this.instantiate(new TreeGameObject(2, 2), new Vector2(2 * 60 + 30, 570 - 2 * 60))
-        this.instantiate(new TreeGameObject(5, 4), new Vector2(4 * 60 + 30, 570 - 5 * 60))
-
         //Cars: CarGameObject(direction, speed)
         this.instantiate(new CarGameObject(1), new Vector2(0, 450))
         this.instantiate(new CarGameObject(-1), new Vector2(600, 330))
         this.instantiate(new CarGameObject(1), new Vector2(0, 90))
 
-        //Week 8: more cars, each lane has its own speed
+        //This is for more cars, each lane has its own speed
         this.instantiate(new CarGameObject(-1, 60), new Vector2(600, 510))   //lane 1, slow
         this.instantiate(new CarGameObject(1, 120), new Vector2(0, 390))     //lane 3, fast
         this.instantiate(new CarGameObject(-1), new Vector2(200, 330))       //lane 4, second car
         this.instantiate(new CarGameObject(-1, 100), new Vector2(600, 210))  //lane 6
         this.instantiate(new CarGameObject(1, 70), new Vector2(0, 150))      //lane 7, slow
+        
+                //Random trees
+        //Need to select one column that never gets a tree, so there is always a clear path to the top
+        let safeCol = Math.floor(Math.random() * 10)
 
-        //Week 8: more trees
-        this.instantiate(new TreeGameObject(5, 1), new Vector2(1 * 60 + 30, 570 - 5 * 60))
-        this.instantiate(new TreeGameObject(5, 7), new Vector2(7 * 60 + 30, 570 - 5 * 60))
-        this.instantiate(new TreeGameObject(9, 3), new Vector2(3 * 60 + 30, 570 - 9 * 60))
-        this.instantiate(new TreeGameObject(9, 6), new Vector2(6 * 60 + 30, 570 - 9 * 60))
+        //Go through lanes 1-9 (lane 0 is the start row, make sure no trees there)
+        for (let lane = 1; lane <= 9; lane++) {
+            //Each lane gets 0,1, or 2 trees
+            let treeCount = Math.floor(Math.random() * 3)
+            let usedCols = []
+
+            for (let i = 0; i < treeCount; i++) {
+                let col = Math.floor(Math.random() * 10)
+
+                //Skip the safe column and columns that already have a tree in this lane
+                if (col !== safeCol && !usedCols.includes(col)) {
+                    usedCols.push(col)
+                    this.instantiate(new TreeGameObject(lane, col), new Vector2(col * 60 + 30, 570 - lane * 60))
+                }
+            }
+        }
     }
 
     drawButton(ctx, b, label) {
@@ -106,3 +117,4 @@ class MainScene extends Scene {
         }
     }
 }
+
