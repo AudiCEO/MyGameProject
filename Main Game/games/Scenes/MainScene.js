@@ -3,35 +3,49 @@ class MainScene extends Scene {
         super()
         this.instantiate(new ChickenGameObject(), new Vector2(270, 570))
 
-        //Cars: CarGameObject(direction, speed)
-        this.instantiate(new CarGameObject(1), new Vector2(0, 450))
-        this.instantiate(new CarGameObject(-1), new Vector2(600, 330))
-        this.instantiate(new CarGameObject(1), new Vector2(0, 90))
+        if (level === 1) {
+            //Level 1: easy, only 3 cars and 3 trees
+            this.instantiate(new CarGameObject(1), new Vector2(0, 450))     //lane 2
+            this.instantiate(new CarGameObject(-1), new Vector2(600, 330))  //lane 4
+            this.instantiate(new CarGameObject(1), new Vector2(0, 90))      //lane 8
 
-        //This is for more cars, each lane has its own speed
-        this.instantiate(new CarGameObject(-1, 60), new Vector2(600, 510))   //lane 1, slow
-        this.instantiate(new CarGameObject(1, 120), new Vector2(0, 390))     //lane 3, fast
-        this.instantiate(new CarGameObject(-1), new Vector2(200, 330))       //lane 4, second car
-        this.instantiate(new CarGameObject(-1, 100), new Vector2(600, 210))  //lane 6
-        this.instantiate(new CarGameObject(1, 70), new Vector2(0, 150))      //lane 7, slow
-        
-                //Random trees
-        //Need to select one column that never gets a tree, so there is always a clear path to the top
-        let safeCol = Math.floor(Math.random() * 10)
-
-        //Go through lanes 1-9 (lane 0 is the start row, make sure no trees there)
-        for (let lane = 1; lane <= 9; lane++) {
-            //Each lane gets 0,1, or 2 trees
-            let treeCount = Math.floor(Math.random() * 3)
-            let usedCols = []
-
-            for (let i = 0; i < treeCount; i++) {
+            //3 trees in random squares (lanes 1 to 9), never on the same square twice
+            let usedSquares = []
+            while (usedSquares.length < 3) {
+                let lane = Math.floor(Math.random() * 9) + 1
                 let col = Math.floor(Math.random() * 10)
+                let square = lane + "," + col
 
-                //Skip the safe column and columns that already have a tree in this lane
-                if (col !== safeCol && !usedCols.includes(col)) {
-                    usedCols.push(col)
+                if (!usedSquares.includes(square)) {
+                    usedSquares.push(square)
                     this.instantiate(new TreeGameObject(lane, col), new Vector2(col * 60 + 30, 570 - lane * 60))
+                }
+            }
+        } else {
+            //Level 2: the full game (8 cars and random trees)
+            this.instantiate(new CarGameObject(1), new Vector2(0, 450))
+            this.instantiate(new CarGameObject(-1), new Vector2(600, 330))
+            this.instantiate(new CarGameObject(1), new Vector2(0, 90))
+            this.instantiate(new CarGameObject(-1, 60), new Vector2(600, 510))   //lane 1, slow
+            this.instantiate(new CarGameObject(1, 120), new Vector2(0, 390))     //lane 3, fast
+            this.instantiate(new CarGameObject(-1), new Vector2(200, 330))       //lane 4, second car
+            this.instantiate(new CarGameObject(-1, 100), new Vector2(600, 210))  //lane 6
+            this.instantiate(new CarGameObject(1, 70), new Vector2(0, 150))      //lane 7, slow
+
+            //Random trees, with one safe column so there is always a path to the top
+            let safeCol = Math.floor(Math.random() * 10)
+
+            for (let lane = 1; lane <= 9; lane++) {
+                let treeCount = Math.floor(Math.random() * 3)
+                let usedCols = []
+
+                for (let i = 0; i < treeCount; i++) {
+                    let col = Math.floor(Math.random() * 10)
+
+                    if (col !== safeCol && !usedCols.includes(col)) {
+                        usedCols.push(col)
+                        this.instantiate(new TreeGameObject(lane, col), new Vector2(col * 60 + 30, 570 - lane * 60))
+                    }
                 }
             }
         }
@@ -62,13 +76,14 @@ class MainScene extends Scene {
 
         super.draw(ctx)
 
-        //Show retries, score, and best score
+        //Show retries, score, best score, and level
         ctx.fillStyle = "black"
         ctx.font = "20px Arial"
         ctx.textAlign = "left"
         ctx.fillText("Retries left: " + lives, 10, 25)
         ctx.fillText("Score: " + score, 10, 50)
         ctx.fillText("Best: " + bestScore, 10, 75)
+        ctx.fillText("Level: " + level, 10, 100)
 
         if (gameState === "playing") return
 
@@ -96,6 +111,11 @@ class MainScene extends Scene {
             ctx.fillText("Reach the top lane to win!", 300, 320)
 
             this.drawButton(ctx, backButton, "Back")
+        } else if (gameState === "levelup") {
+            ctx.fillStyle = "green"
+            ctx.font = "44px Arial"
+            ctx.fillText("Level 1 Complete!", 300, 260)
+            this.drawButton(ctx, menuButton, "Level 2")
         } else if (gameState === "over") {
             ctx.fillStyle = "black"
             ctx.font = "50px Arial"
