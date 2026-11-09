@@ -1,14 +1,17 @@
-//Which screen we are on: "start", "playing", "help", "over", or "won"
+//Which screen we are on: "start", "playing", "help", "levelup", "over", or "won"
 let gameState = "start"
 
 //How many retries the chicken has left (1 means one extra try)
 let lives = 1
 
-//Week 7 variables
+//Which level we are on (1 or 2)
+let level = 1
+
+//Score variables
 let score = 0
 let bestScore = 0
-let highestLane = 0     
-let invincibleTime = 0  
+let highestLane = 0     //the furthest lane the chicken has reached
+let invincibleTime = 0  //seconds of protection left after a hit
 
 //Ends the game and saves the best score
 function endGame(state) {
@@ -39,7 +42,18 @@ addEventListener("click", function (event) {
     } else if (gameState === "over" || gameState === "won") {
         if (isInside(mx, my, menuButton)) {
             lives = 1
+            level = 1
             score = 0
+            highestLane = 0
+            invincibleTime = 0
+            Engine.currentScene = new MainScene()
+            Engine.currentScene.start()
+            gameState = "playing"
+        }
+    } else if (gameState === "levelup") {
+        if (isInside(mx, my, menuButton)) {
+            level = 2
+            lives = 1
             highestLane = 0
             invincibleTime = 0
             Engine.currentScene = new MainScene()
@@ -82,7 +96,13 @@ class ChickenController extends Component {
 
     move(newLane, newCol) {
         if (newLane > 9) {
-            endGame("won")
+            if (level === 1) {
+                //Finished level 1, show the level up screen
+                gameState = "levelup"
+            } else {
+                //Finished level 2, the player wins
+                endGame("won")
+            }
             return
         }
 
