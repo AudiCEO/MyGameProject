@@ -22,7 +22,7 @@ class MainScene extends Scene {
                 }
             }
         } else {
-            //Level 2: the full game (8 cars and random trees)
+            //Level 2: more cars/trees (8 cars and random trees)
             this.instantiate(new CarGameObject(1), new Vector2(0, 450))
             this.instantiate(new CarGameObject(-1), new Vector2(600, 330))
             this.instantiate(new CarGameObject(1), new Vector2(0, 90))
