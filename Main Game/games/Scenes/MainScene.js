@@ -4,12 +4,9 @@ class MainScene extends Scene {
         this.instantiate(new ChickenGameObject(), new Vector2(270, 570))
 
         if (level === 1) {
-            //Level 1: easy, only 3 cars and 3 trees
             this.instantiate(new CarGameObject(1), new Vector2(0, 450))     //lane 2
             this.instantiate(new CarGameObject(-1), new Vector2(600, 330))  //lane 4
             this.instantiate(new CarGameObject(1), new Vector2(0, 90))      //lane 8
-
-            //3 trees in random squares (lanes 1 to 9), never on the same square twice
             let usedSquares = []
             while (usedSquares.length < 3) {
                 let lane = Math.floor(Math.random() * 9) + 1
@@ -22,7 +19,7 @@ class MainScene extends Scene {
                 }
             }
         } else {
-            //Level 2: more cars/trees (8 cars and random trees)
+            //Level 2: the full game (8 cars and random trees)
             this.instantiate(new CarGameObject(1), new Vector2(0, 450))
             this.instantiate(new CarGameObject(-1), new Vector2(600, 330))
             this.instantiate(new CarGameObject(1), new Vector2(0, 90))
@@ -32,7 +29,6 @@ class MainScene extends Scene {
             this.instantiate(new CarGameObject(-1, 100), new Vector2(600, 210))  //lane 6
             this.instantiate(new CarGameObject(1, 70), new Vector2(0, 150))      //lane 7, slow
 
-            //Random trees, with one safe column so there is always a path to the top
             let safeCol = Math.floor(Math.random() * 10)
 
             for (let lane = 1; lane <= 9; lane++) {
@@ -61,8 +57,24 @@ class MainScene extends Scene {
     }
 
     draw(ctx) {
-        //Grid lines
-        ctx.strokeStyle = "#cccccc"
+        //Week 11: lane colors. The lanes that have cars are road, the rest are grass
+        let roadLanes = [2, 4, 8]
+        if (level === 2) {
+            roadLanes = [1, 2, 3, 4, 6, 7, 8]
+        }
+
+        for (let lane = 0; lane < 10; lane++) {
+            //Lane 0 is the bottom row, so its top edge is at y = 540
+            let y = 540 - lane * 60
+
+            if (roadLanes.includes(lane)) {
+                ctx.fillStyle = "#555555"   //dark gray road
+            } else {
+                ctx.fillStyle = "#8fd97a"   //light green grass
+            }
+            ctx.fillRect(0, y, 600, 60)
+        }
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.35)"
         for (let i = 0; i <= 10; i++) {
             ctx.beginPath()
             ctx.moveTo(i * 60, 0)
@@ -75,8 +87,6 @@ class MainScene extends Scene {
         }
 
         super.draw(ctx)
-
-        //Show retries, score, best score, and level
         ctx.fillStyle = "black"
         ctx.font = "20px Arial"
         ctx.textAlign = "left"
@@ -87,7 +97,6 @@ class MainScene extends Scene {
 
         if (gameState === "playing") return
 
-        //Fade out the board behind the menus
         ctx.fillStyle = "rgba(255, 255, 255, 0.9)"
         ctx.fillRect(0, 0, 600, 600)
         ctx.textAlign = "center"
@@ -102,14 +111,12 @@ class MainScene extends Scene {
             ctx.fillStyle = "black"
             ctx.font = "34px Arial"
             ctx.fillText("How to Play", 300, 100)
-
-            ctx.font = "20px Arial"
+         ctx.font = "20px Arial"
             ctx.fillText("Arrow Left / Right: move sideways", 300, 160)
             ctx.fillText("Space: hop forward one lane", 300, 190)
             ctx.fillText("Green shapes (trees): block your path, can't move onto them", 300, 240)
             ctx.fillText("Red rectangles (cars): moving obstacles, touching one costs a retry", 300, 280)
             ctx.fillText("Reach the top lane to win!", 300, 320)
-
             this.drawButton(ctx, backButton, "Back")
         } else if (gameState === "levelup") {
             ctx.fillStyle = "green"
@@ -127,8 +134,6 @@ class MainScene extends Scene {
             ctx.fillText("You Win!", 300, 260)
             this.drawButton(ctx, menuButton, "Restart")
         }
-
-        //Show the final score on the end screens
         if (gameState === "over" || gameState === "won") {
             ctx.fillStyle = "black"
             ctx.font = "24px Arial"
