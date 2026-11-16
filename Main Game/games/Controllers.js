@@ -1,19 +1,11 @@
-//Which screen we are on: "start", "playing", "help", "levelup", "over", or "won"
 let gameState = "start"
-
-//How many retries the chicken has left (1 means one extra try)
 let lives = 1
-
-//Which level we are on (1 or 2)
 let level = 1
-
-//Score variables
 let score = 0
 let bestScore = 0
-let highestLane = 0     //the furthest lane the chicken has reached
-let invincibleTime = 0  //seconds of protection left after a hit
+let highestLane = 0  
+let invincibleTime = 0 
 
-//Ends the game and saves the best score
 function endGame(state) {
     gameState = state
     if (score > bestScore) {
@@ -145,7 +137,6 @@ class ChickenController extends Component {
         }
     }
 }
-
 class CarController extends Component {
     speed = 80
     dir = 1
