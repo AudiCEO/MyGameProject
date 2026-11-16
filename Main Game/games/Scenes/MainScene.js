@@ -19,7 +19,6 @@ class MainScene extends Scene {
                 }
             }
         } else {
-            //Level 2: the full game (8 cars and random trees)
             this.instantiate(new CarGameObject(1), new Vector2(0, 450))
             this.instantiate(new CarGameObject(-1), new Vector2(600, 330))
             this.instantiate(new CarGameObject(1), new Vector2(0, 90))
@@ -30,15 +29,12 @@ class MainScene extends Scene {
             this.instantiate(new CarGameObject(1, 70), new Vector2(0, 150))      //lane 7, slow
 
             let safeCol = Math.floor(Math.random() * 10)
-
-            for (let lane = 1; lane <= 9; lane++) {
+              for (let lane = 1; lane <= 9; lane++){
                 let treeCount = Math.floor(Math.random() * 3)
                 let usedCols = []
-
-                for (let i = 0; i < treeCount; i++) {
+              for (let i = 0; i < treeCount; i++) {
                     let col = Math.floor(Math.random() * 10)
-
-                    if (col !== safeCol && !usedCols.includes(col)) {
+                        if (col !== safeCol && !usedCols.includes(col)) {
                         usedCols.push(col)
                         this.instantiate(new TreeGameObject(lane, col), new Vector2(col * 60 + 30, 570 - lane * 60))
                     }
@@ -55,9 +51,7 @@ class MainScene extends Scene {
         ctx.textAlign = "center"
         ctx.fillText(label, b.x + b.w / 2, b.y + 38)
     }
-
     draw(ctx) {
-        //Week 11: lane colors. The lanes that have cars are road, the rest are grass
         let roadLanes = [2, 4, 8]
         if (level === 2) {
             roadLanes = [1, 2, 3, 4, 6, 7, 8]
@@ -66,8 +60,7 @@ class MainScene extends Scene {
         for (let lane = 0; lane < 10; lane++) {
             //Lane 0 is the bottom row, so its top edge is at y = 540
             let y = 540 - lane * 60
-
-            if (roadLanes.includes(lane)) {
+              if (roadLanes.includes(lane)) {
                 ctx.fillStyle = "#555555"   //dark gray road
             } else {
                 ctx.fillStyle = "#8fd97a"   //light green grass
@@ -100,7 +93,6 @@ class MainScene extends Scene {
         ctx.fillStyle = "rgba(255, 255, 255, 0.9)"
         ctx.fillRect(0, 0, 600, 600)
         ctx.textAlign = "center"
-
         if (gameState === "start") {
             ctx.fillStyle = "black"
             ctx.font = "50px Arial"
