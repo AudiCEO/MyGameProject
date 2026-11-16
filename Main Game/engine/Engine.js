@@ -1,32 +1,9 @@
-// Please carefully review the rules about academic integrity found in the academicIntegrity.md file found at the root of this project.
-
-/**
- * The engine class for our games
- * 
- * This contains all the code that would be used by all games
- * The API for this class is primarily based on the Unity API
- */
 class Engine {
-    /**
-     * @type{HTMLCanvasElement} A reference to the canvas HTML element
-     */
     static canvas
-
-    /**
-     * @type{CanvasRenderingContext2D} A reference to the context we will draw to
-     * 
-     * Whenever we want to draw anything, we will use this variable
-     */
     static ctx
-
-    /**
-     * @type{Scene}
-     */
     static currentScene
 
-   /**
-    * 
-    */
+
     static start() {
         //Grab the canvas element and put it into an element named canvas
         Engine.canvas = document.querySelector("#canv")
